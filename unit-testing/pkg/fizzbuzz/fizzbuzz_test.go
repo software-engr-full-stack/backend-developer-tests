@@ -2,17 +2,18 @@ package fizzbuzz
 
 import "testing"
 
-func TestFizzBuzz(t *testing.T) {
-	type input struct {
-		total int64
-		fizzAt int64
-		buzzAt int64
-	}
-	type testType struct {
-		input
-		expected []string
-	}
+type input struct {
+	total int64
+	fizzAt int64
+	buzzAt int64
+}
+type testType struct {
+	input
+	expected []string
+	panic string
+}
 
+func TestFizzBuzz(t *testing.T) {
 	tests := []testType{
 		testType{
 			input: input{total: 16, fizzAt: 3, buzzAt: 5},
@@ -47,9 +48,26 @@ func TestFizzBuzz(t *testing.T) {
 			input: input{total: 1, fizzAt: 1, buzzAt: 1},
 			expected: []string{"FizzBuzz"},
 		},
+
+		testType{
+			input: input{total: -1},
+			panic: "The number of items to FizzBuzz should not be negative",
+		},
+
+		testType{
+			input: input{total: -1234},
+			panic: "The number of items to FizzBuzz should not be negative",
+		},
 	}
 
 	for _, test := range tests {
+		if test.panic != "" {
+			if actual, expected := panicMessage(test), test.panic; actual != expected {
+				t.Fatalf("Panic message actual %#v != expected %#v", actual, expected)
+			}
+			continue
+		}
+
 		result := FizzBuzz(test.total, test.fizzAt, test.buzzAt)
 
 		if actual, expected := len(result), len(test.expected); actual != expected {
@@ -62,4 +80,17 @@ func TestFizzBuzz(t *testing.T) {
 			}
 		}
 	}
+}
+
+func panicMessage(test testType) (msg string) {
+    defer func() {
+        if r := recover(); r != nil {
+        	msg = r.(string)
+        }
+    }()
+
+
+    FizzBuzz(test.total, test.fizzAt, test.buzzAt)
+
+    return
 }
