@@ -27,6 +27,26 @@ func TestFizzBuzz(t *testing.T) {
 		testType{
 			input: input{total: 0},
 		},
+
+		testType{
+			input: input{total: 1, fizzAt: 2, buzzAt: 3},
+			expected: []string{"1"},
+		},
+
+		testType{
+			input: input{total: 1, fizzAt: 1, buzzAt: 10},
+			expected: []string{"Fizz"},
+		},
+
+		testType{
+			input: input{total: 1, fizzAt: 5, buzzAt: 1},
+			expected: []string{"Buzz"},
+		},
+
+		testType{
+			input: input{total: 1, fizzAt: 1, buzzAt: 1},
+			expected: []string{"FizzBuzz"},
+		},
 	}
 
 	for _, test := range tests {
