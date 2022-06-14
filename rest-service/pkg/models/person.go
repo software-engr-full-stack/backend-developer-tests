@@ -100,5 +100,5 @@ func (person *Person) ToJSON() (string, error) {
 		return "", err
 	}
 
-	return string(marshaled[:]), nil
+	return string(marshaled), nil
 }
