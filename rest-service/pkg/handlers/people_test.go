@@ -13,6 +13,9 @@ import (
 
 func TestPeople(t *testing.T) {
     path := "/people"
+
+    onlyGET(t, path)
+
     req := httptest.NewRequest(http.MethodGet, path, nil)
     w := httptest.NewRecorder()
     People(w, req)

@@ -37,6 +37,8 @@ func TestPeopleID(t *testing.T) {
     }
 
     for _, test := range tests {
+        onlyGET(t, test.path)
+
         req := httptest.NewRequest(http.MethodGet, test.path, nil)
         w := httptest.NewRecorder()
         People(w, req)

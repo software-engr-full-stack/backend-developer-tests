@@ -4,6 +4,8 @@ import (
     "testing"
     "io"
     "net/http"
+    "net/http/httptest"
+    "encoding/json"
     "reflect"
     "fmt"
 
@@ -64,6 +66,37 @@ type titleBuilder struct {
 
 func (tb *titleBuilder) build(title string) string {
     return fmt.Sprintf("%s, %s", tb.path, title)
+}
+
+func onlyGET(t *testing.T, path string) {
+    req := httptest.NewRequest(http.MethodPost, path, nil)
+    w := httptest.NewRecorder()
+    People(w, req)
+    res := w.Result()
+    defer res.Body.Close()
+
+    tb := titleBuilder{path: fmt.Sprintf("%s %s", http.MethodPost, path)}
+    title := tb.build("response code")
+    if actual, expected := res.StatusCode, 404; actual != expected {
+        t.Fatalf("%s: actual not equal to expected, %#v != %#v", title, actual, expected)
+    }
+
+    data, err := io.ReadAll(res.Body)
+    title = tb.build("read response body error")
+    if actual, expected := err, error(nil); actual != expected {
+        t.Fatalf("%s: actual not equal to expected, %#v != %#v", title, actual, expected)
+    }
+
+    var eresp map[string]string
+    title = tb.build("unmarshal response body error")
+    if actual, expected := json.Unmarshal(data, &eresp), error(nil); actual != expected {
+        t.Fatalf("%s: actual not equal to expected, %#v != %#v", title, actual, expected)
+    }
+
+    title = tb.build("error details")
+    if actual, expected := eresp["error"], http.StatusText(http.StatusNotFound); actual != expected {
+        t.Fatalf("%s: actual not equal to expected, %#v != %#v", title, actual, expected)
+    }
 }
 
 func runCommonTests(t *testing.T, path string, res *http.Response, expectedStatusCode int) []byte {

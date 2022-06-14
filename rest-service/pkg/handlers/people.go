@@ -14,6 +14,13 @@ import (
 func People(w http.ResponseWriter, req *http.Request) {
     w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
+    if req.Method != http.MethodGet {
+        w.WriteHeader(http.StatusNotFound)
+        msg := jsonError(fmt.Errorf("%s", http.StatusText(http.StatusNotFound)))
+        fmt.Fprintln(w, string(msg))
+        return
+    }
+
     id := extractID(req.URL.Path, "/people")
     if id != "" {
         person, err := models.FindPersonByID(uuid.Must(uuid.FromString(id)))
