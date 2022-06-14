@@ -30,6 +30,12 @@ func People(w http.ResponseWriter, req *http.Request) {
         return
     }
 
+    wpph := newWithPhoneNumberParamHandler(req)
+    if wpph.paramPresent {
+        wpph.handle(w)
+        return
+    }
+
     data, err := json.Marshal(models.AllPeople())
     if err != nil {
         msg := jsonError(fmt.Errorf("marshaling of all people failed"))
