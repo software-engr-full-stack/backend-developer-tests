@@ -103,14 +103,14 @@ func TestPeople(t *testing.T) {
 
     for _, actualPerson := range actualPeople {
         key := buildKey(actualPerson.LastName, actualPerson.FirstName, actualPerson.PhoneNumber)
-        title = fmt.Sprintf("presence of person %#v", key)
+        title = buildTitle(fmt.Sprintf("presence of person %#v", key))
         expectedPerson, ok := expectedPeopleMap[key]
         if actual, expected := ok, true; actual != expected {
             t.Fatalf("%s: actual not equal to expected, %#v != %#v", title, actual, expected)
         }
-        isDeepEqual := reflect.DeepEqual(actualPerson, expectedPerson)
-        if actual, expected := isDeepEqual, true; actual != expected {
-            t.Fatalf("%s: actual not equal to expected, %#v != %#v", title, actual, expected)
+        title = buildTitle("person details")
+        if isDeepEqual := reflect.DeepEqual(actualPerson, expectedPerson); !isDeepEqual {
+            t.Fatalf("%s: actual not equal to expected, %#v != %#v", title, actualPerson, expectedPerson)
         }
     }
 }
