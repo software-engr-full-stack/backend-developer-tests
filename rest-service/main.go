@@ -17,6 +17,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/people", handlers.People)
+	mux.HandleFunc("/people/", handlers.People)
 
 	port := "8000"
 
