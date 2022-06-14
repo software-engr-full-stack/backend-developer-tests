@@ -1,6 +1,9 @@
 package fizzbuzz
 
-import "testing"
+import (
+	"testing"
+	"fmt"
+)
 
 type input struct {
 	total int64
@@ -11,6 +14,8 @@ type testType struct {
 	input
 	expected []string
 	panic string
+	disable bool
+	title string
 }
 
 func TestFizzBuzz(t *testing.T) {
@@ -85,10 +90,18 @@ func TestFizzBuzz(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
+	for tix, test := range tests {
+		title := test.title
+		if title == "" {
+			title = fmt.Sprintf("Test number %#v", tix + 1)
+		}
+		if test.disable {
+			t.Logf("%s is disabled", title)
+			continue
+		}
 		if test.panic != "" {
 			if actual, expected := panicMessage(test), test.panic; actual != expected {
-				t.Fatalf("Panic message actual %#v != expected %#v", actual, expected)
+				t.Fatalf("%s: panic message actual %#v != expected %#v", title, actual, expected)
 			}
 			continue
 		}
@@ -96,12 +109,12 @@ func TestFizzBuzz(t *testing.T) {
 		result := FizzBuzz(test.total, test.fizzAt, test.buzzAt)
 
 		if actual, expected := len(result), len(test.expected); actual != expected {
-			t.Fatalf("Result length actual %#v != expected %#v", actual, expected)
+			t.Fatalf("%s: result length actual %#v != expected %#v", title, actual, expected)
 		}
 
 		for ix := range test.expected {
 			if actual, expected := result[ix], test.expected[ix]; actual != expected {
-				t.Fatalf("At index %#v, actual %#v != expected %#v", ix, actual, expected)
+				t.Fatalf("%s: at index %#v, actual %#v != expected %#v", title, ix, actual, expected)
 			}
 		}
 	}
