@@ -16,14 +16,21 @@ type withParamsHandler struct {
 
 func newWithParamsHandler(req *http.Request) withParamsHandler {
     q := req.URL.Query()
+    noParams := withParamsHandler{paramsPresent: false}
     if len(q) == 0 {
-        return withParamsHandler{paramsPresent: false}
+        return noParams
+    }
+
+    qfn := q["first_name"]
+    qln := q["last_name"]
+    if qfn == nil || qln == nil {
+        return noParams
     }
 
     return withParamsHandler{
         paramsPresent: true,
-        firstName: q["first_name"][0],
-        lastName: q["last_name"][0],
+        firstName: qfn[0],
+        lastName: qln[0],
     }
 }
 
