@@ -26,12 +26,8 @@ func People(w http.ResponseWriter, req *http.Request) {
 
         data, err := json.Marshal(person)
         if err != nil {
-            marshalErrorMsg, err := json.Marshal(map[string]string{"error": "marshaling of person failed"})
-            if err != nil {
-                panic(err)
-            }
-
-            fmt.Fprintln(w, string(marshalErrorMsg))
+            msg := jsonError(fmt.Errorf("marshaling of person failed"))
+            fmt.Fprintln(w, string(msg))
             return
         }
 
@@ -41,12 +37,8 @@ func People(w http.ResponseWriter, req *http.Request) {
 
     data, err := json.Marshal(models.AllPeople())
     if err != nil {
-        marshalErrorMsg, err := json.Marshal(map[string]string{"error": "marshaling of all people failed"})
-        if err != nil {
-            panic(err)
-        }
-
-        fmt.Fprintln(w, string(marshalErrorMsg))
+        msg := jsonError(fmt.Errorf("marshaling of all people failed"))
+        fmt.Fprintln(w, string(msg))
         return
     }
 
@@ -55,9 +47,7 @@ func People(w http.ResponseWriter, req *http.Request) {
 
 func extractID(path, prefix string) string {
     id := strings.TrimPrefix(path, prefix)
-
     id = strings.TrimLeft(id, "/")
-
     return id
 }
 
@@ -66,6 +56,5 @@ func jsonError(err error) []byte {
     if err != nil {
         panic(err)
     }
-
     return msg
 }
