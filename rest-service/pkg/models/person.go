@@ -2,7 +2,6 @@ package models
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 
 	"github.com/satori/go.uuid"
@@ -65,7 +64,7 @@ func FindPersonByID(id uuid.UUID) (*Person, error) {
 		}
 	}
 
-	return nil, errors.New(fmt.Sprintf("user ID %s not found", id.String()))
+	return nil, fmt.Errorf("user ID %s not found", id.String())
 }
 
 // FindPeopleByName performs a case-sensitive search for people in `people` by first and last name.
