@@ -77,6 +77,13 @@ func TestPeople(t *testing.T) {
         t.Fatalf("%s: actual not equal to expected, %#v != %#v", title, actual, expected)
     }
 
+    title = buildTitle("content type")
+    actualHeader := res.Header["Content-Type"]
+    expectedHeader := []string{"application/json; charset=utf-8"}
+    if isDeepEqual := reflect.DeepEqual(actualHeader, expectedHeader); !isDeepEqual {
+        t.Fatalf("%s: actual not equal to expected, %#v != %#v", title, actualHeader, expectedHeader)
+    }
+
     data, err := io.ReadAll(res.Body)
     title = buildTitle("read response body error")
     if actual, expected := err, error(nil); actual != expected {

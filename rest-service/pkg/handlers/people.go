@@ -14,5 +14,7 @@ func People(w http.ResponseWriter, req *http.Request) {
         panic(err)
     }
 
+    w.Header().Set("Content-Type", "application/json; charset=utf-8")
+
     fmt.Fprintln(w, string(data))
 }
