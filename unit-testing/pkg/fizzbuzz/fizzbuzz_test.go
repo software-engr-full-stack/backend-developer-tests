@@ -120,7 +120,7 @@ func TestFizzBuzz(t *testing.T) {
 	}
 }
 
-func panicMessage(test testType) (msg string) {
+func panicMessage(test testType) (msg string) { //nolint:gocritic,hugeParam
     defer func() {
         if r := recover(); r != nil {
         	msg = r.(string)
