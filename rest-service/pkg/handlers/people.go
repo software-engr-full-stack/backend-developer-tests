@@ -9,12 +9,18 @@ import (
 )
 
 func People(w http.ResponseWriter, req *http.Request) {
+    w.Header().Set("Content-Type", "application/json; charset=utf-8")
+
     data, err := json.Marshal(models.AllPeople())
     if err != nil {
-        panic(err)
-    }
+        marshalErrorMsg, err := json.Marshal(map[string]string{"error": "marshaling of all people failed"})
+        if err != nil {
+            panic(err)
+        }
 
-    w.Header().Set("Content-Type", "application/json; charset=utf-8")
+        fmt.Fprintln(w, string(marshalErrorMsg))
+        return
+    }
 
     fmt.Fprintln(w, string(data))
 }
