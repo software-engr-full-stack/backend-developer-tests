@@ -24,9 +24,9 @@ func People(w http.ResponseWriter, req *http.Request) {
         return
     }
 
-    wph := newWithParamsHandler(req)
-    if wph.paramsPresent {
-        wph.handle(w)
+    wnph := newWithNamesParamsHandler(req)
+    if wnph.paramsPresent {
+        wnph.handle(w)
         return
     }
 
