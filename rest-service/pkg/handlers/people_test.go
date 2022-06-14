@@ -60,6 +60,14 @@ var expectedPeopleMap = func() map[string]*models.Person{
     return table
 }()
 
+type titleBuilder struct {
+    path string
+}
+
+func (tb *titleBuilder) build(title string) string {
+    return fmt.Sprintf("%s, %s", tb.path, title)
+}
+
 func TestPeople(t *testing.T) {
     path := "/people"
     req := httptest.NewRequest(http.MethodGet, path, nil)
@@ -68,16 +76,44 @@ func TestPeople(t *testing.T) {
     res := w.Result()
     defer res.Body.Close()
 
-    buildTitle := func(title string) string {
-        return fmt.Sprintf("%s, %s", path, title)
+    data := runCommonTests(t, path, res)
+
+    tb := titleBuilder{path: path}
+
+    var actualPeople []*models.Person
+    title := tb.build("unmarshal response body error")
+    if actual, expected := json.Unmarshal(data, &actualPeople), error(nil); actual != expected {
+        t.Fatalf("%s: actual not equal to expected, %#v != %#v", title, actual, expected)
     }
 
-    title := buildTitle("response code")
+    title = tb.build("people count")
+    if actual, expected := len(actualPeople), len(expectedPeople); actual != expected {
+        t.Fatalf("%s: actual not equal to expected, %#v != %#v", title, actual, expected)
+    }
+
+    for _, actualPerson := range actualPeople {
+        key := buildKey(actualPerson.LastName, actualPerson.FirstName, actualPerson.PhoneNumber)
+        title = tb.build(fmt.Sprintf("presence of person %#v", key))
+        expectedPerson, ok := expectedPeopleMap[key]
+        if actual, expected := ok, true; actual != expected {
+            t.Fatalf("%s: actual not equal to expected, %#v != %#v", title, actual, expected)
+        }
+        title = tb.build("person details")
+        if isDeepEqual := reflect.DeepEqual(actualPerson, expectedPerson); !isDeepEqual {
+            t.Fatalf("%s: actual not equal to expected, %#v != %#v", title, actualPerson, expectedPerson)
+        }
+    }
+}
+
+func runCommonTests(t *testing.T, path string, res *http.Response) []byte {
+    tb := titleBuilder{path: path}
+
+    title := tb.build("response code")
     if actual, expected := res.StatusCode, 200; actual != expected {
         t.Fatalf("%s: actual not equal to expected, %#v != %#v", title, actual, expected)
     }
 
-    title = buildTitle("content type")
+    title = tb.build("content type")
     actualHeader := res.Header["Content-Type"]
     expectedHeader := []string{"application/json; charset=utf-8"}
     if isDeepEqual := reflect.DeepEqual(actualHeader, expectedHeader); !isDeepEqual {
@@ -85,34 +121,11 @@ func TestPeople(t *testing.T) {
     }
 
     data, err := io.ReadAll(res.Body)
-    title = buildTitle("read response body error")
+    title = tb.build("read response body error")
     if actual, expected := err, error(nil); actual != expected {
         t.Fatalf("%s: actual not equal to expected, %#v != %#v", title, actual, expected)
     }
-
-    var actualPeople []*models.Person
-    title = buildTitle("unmarshal response body error")
-    if actual, expected := json.Unmarshal(data, &actualPeople), error(nil); actual != expected {
-        t.Fatalf("%s: actual not equal to expected, %#v != %#v", title, actual, expected)
-    }
-
-    title = buildTitle("people count")
-    if actual, expected := len(actualPeople), len(expectedPeople); actual != expected {
-        t.Fatalf("%s: actual not equal to expected, %#v != %#v", title, actual, expected)
-    }
-
-    for _, actualPerson := range actualPeople {
-        key := buildKey(actualPerson.LastName, actualPerson.FirstName, actualPerson.PhoneNumber)
-        title = buildTitle(fmt.Sprintf("presence of person %#v", key))
-        expectedPerson, ok := expectedPeopleMap[key]
-        if actual, expected := ok, true; actual != expected {
-            t.Fatalf("%s: actual not equal to expected, %#v != %#v", title, actual, expected)
-        }
-        title = buildTitle("person details")
-        if isDeepEqual := reflect.DeepEqual(actualPerson, expectedPerson); !isDeepEqual {
-            t.Fatalf("%s: actual not equal to expected, %#v != %#v", title, actualPerson, expectedPerson)
-        }
-    }
+    return data
 }
 
 func buildKey(ln, fn, pn string) string {
