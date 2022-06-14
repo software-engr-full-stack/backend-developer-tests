@@ -1,4 +1,4 @@
-module github.com/stackpath/backend-developer-tests/rest-service
+module github.com/software-engr-full-stack/backend-developer-tests/rest-service
 
 go 1.15
 
