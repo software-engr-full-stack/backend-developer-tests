@@ -26,7 +26,7 @@ func TestFizzBuzz(t *testing.T) {
 		},
 
 		testType{
-			input: input{total: 0},
+			input: input{total: 0, fizzAt: 1, buzzAt: 1},
 		},
 
 		testType{
@@ -57,6 +57,31 @@ func TestFizzBuzz(t *testing.T) {
 		testType{
 			input: input{total: -1234},
 			panic: "The number of items to FizzBuzz should not be negative",
+		},
+
+
+		testType{
+			input: input{total: 12, buzzAt: 8},
+			panic: "The number to Fizz at should be greater than 0",
+		},
+
+		testType{
+			input: input{total: 12, fizzAt: -5},
+			panic: "The number to Fizz at should be greater than 0",
+		},
+
+		testType{
+			input: input{total: 7, fizzAt: 3},
+			panic: "The number to Buzz at should be greater than 0",
+		},
+
+		testType{
+			input: input{total: 78, fizzAt: 45, buzzAt: -1},
+			panic: "The number to Buzz at should be greater than 0",
+		},
+
+		testType{
+			panic: "The number to Fizz at should be greater than 0",
 		},
 	}
 

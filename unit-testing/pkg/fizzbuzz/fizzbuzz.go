@@ -18,6 +18,14 @@ func FizzBuzz(total, fizzAt, buzzAt int64) []string {
 		panic("The number of items to FizzBuzz should not be negative")
 	}
 
+	if fizzAt < 1 {
+		panic("The number to Fizz at should be greater than 0")
+	}
+
+	if buzzAt < 1 {
+		panic("The number to Buzz at should be greater than 0")
+	}
+
 	result := make([]string, total)
 
 	for i := int64(1); i <= total; i++ {
