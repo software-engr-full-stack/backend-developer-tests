@@ -14,7 +14,7 @@ type SimplePool interface {
 	// for the task, this blocks until it can submit.
 	Submit(func())
 
-	// I had to add this function to the interface in order for this to work.
+	// Notes: I had to add this function to the interface in order for this to work.
 	// If we want to keep the SimplePool interface the same, one option
 	// is for NewSimplePool to return *SimplePoolRunner instead of SimplePool.
 	Wait()
