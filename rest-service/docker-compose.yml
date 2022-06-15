@@ -8,10 +8,21 @@ volumes:
   prometheus_data: {}
 
 services:
+  app:
+    container_name: stackpath-backend-developer-tests-rest-service
+    restart: always
+    build:
+      context: .
+      dockerfile: ./main.Dockerfile
+    ports:
+      - 8000:8000
+
   grafana:
     image: grafana/grafana-enterprise:8.2.0
+    container_name: grafana
+    restart: unless-stopped
     ports:
-      - 3000:3000
+      - 3030:3030
     networks:
       - monitoring
 
