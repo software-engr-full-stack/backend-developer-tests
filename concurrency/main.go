@@ -16,10 +16,13 @@ func main() {
         totalDelay += d
     }
 
+    // Notes: running without concurrency will take at least "totalDelay" seconds.
     if false {
         runWithoutConcurrency(funList, totalDelay)
     }
 
+    // Notes: running with concurrency will take at least the largest delay value in seconds
+    // plus a few seconds.
     const maxConcurrent = 4
     simplePool := concurrency.NewSimplePool(maxConcurrent)
     for _, fun := range funList {
