@@ -49,4 +49,19 @@ func TestPeople(t *testing.T) {
             t.Fatalf("%s: actual not equal to expected, %#v != %#v", title, actualPerson, expectedPerson)
         }
     }
+
+    path = "/peopleTHISHOULD404"
+    onlyGET(t, path)
+
+    req = httptest.NewRequest(http.MethodGet, path, nil)
+    w = httptest.NewRecorder()
+    People(w, req)
+    res = w.Result()
+    defer res.Body.Close()
+
+    tb = titleBuilder{path: path}
+    title = tb.build("response code")
+    if actual, expected := res.StatusCode, 404; actual != expected {
+        t.Fatalf("%s: actual not equal to expected, %#v != %#v", title, actual, expected)
+    }
 }

@@ -3,6 +3,7 @@ package handlers
 import (
     "net/http"
     "encoding/json"
+    "strings"
     "fmt"
 
     "github.com/software-engr-full-stack/backend-developer-tests/rest-service/pkg/models"
@@ -19,8 +20,16 @@ func People(w http.ResponseWriter, req *http.Request) {
         return
     }
 
+    // Notes: so paths like /peopleTHISHOULD404 should 404
+    if !firstPathComponentShouldMatch(req.URL.Path, "people") {
+        w.WriteHeader(http.StatusNotFound)
+        msg := jsonError(fmt.Errorf("%s", http.StatusText(http.StatusNotFound)))
+        fmt.Fprintln(w, string(msg))
+        return
+    }
+
     // Notes: handle GET /people/:id
-    wid := newWithIDHandler(req.URL.Path, "/people")
+    wid := newWithIDHandler(req.URL.Path, "/people/")
     if wid.idPresent {
         wid.handle(w)
         return
@@ -57,4 +66,9 @@ func jsonError(err error) []byte {
         panic(err)
     }
     return msg
+}
+
+func firstPathComponentShouldMatch(path, desiredMatch string) bool {
+    pcomp := strings.Split(path, "/")
+    return pcomp[1] == desiredMatch
 }
