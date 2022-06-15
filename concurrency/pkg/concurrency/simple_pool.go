@@ -28,9 +28,11 @@ func NewSimplePool(maxConcurrent int) SimplePool {
 
 	fq := make(chan func())
 
+	// Notes: create maxConcurrent goroutines
 	for i := 0; i < maxConcurrent; i++ {
 		wg.Add(1)
 		go func() {
+			// Notes: unbuffered channel (see declaration), will block when empty
 			for fun := range fq {
 				fun()
 			}
