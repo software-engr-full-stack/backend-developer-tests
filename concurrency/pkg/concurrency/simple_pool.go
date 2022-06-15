@@ -51,6 +51,10 @@ func (spr *SimplePoolRunner) Submit(fun func()) {
 }
 
 func (spr *SimplePoolRunner) Wait() {
+	// Notes: originally, the "spr.wg.Wait()" line was ahead of the "close(spr.funQueue)" line.
+	// This caused the program to crash with the error message "fatal error: all goroutines are asleep - deadlock!".
+	// The solution was to close the channel first after all the inputs have been shoved into the channel,
+	// then wait for the goroutines to finish executing.
 	close(spr.funQueue)
 	spr.wg.Wait()
 }
