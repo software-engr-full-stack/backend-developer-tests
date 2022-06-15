@@ -18,9 +18,10 @@ type withIDHandler struct {
 
 func newWithIDHandler(path, prefix string) (withIDHandler) {
     id := strings.TrimPrefix(path, prefix)
-    id = strings.TrimLeft(id, "/")
 
-    if id == "" {
+    // Notes: because strings.TrimPrefix will return the the path value if a
+    // prefix match isn't found.
+    if id == "" || id == path {
         return withIDHandler{idPresent: false}
     }
 
