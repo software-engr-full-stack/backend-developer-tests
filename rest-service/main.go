@@ -7,6 +7,8 @@ import (
 
 	"fmt"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+
 	"github.com/software-engr-full-stack/backend-developer-tests/rest-service/pkg/handlers"
 )
 
@@ -21,6 +23,8 @@ func main() {
 	mux.HandleFunc("/people", handlers.People)
 	mux.HandleFunc("/people/", handlers.People)
 
+	mux.HandleFunc("/metrics", metrics)
+
 	port := "8000"
 
 	// Notes: written this way so I can easily add middleware in the future.
@@ -34,4 +38,8 @@ func main() {
 
     fmt.Println("Server started on PORT " + port)
     log.Fatal(srv.ListenAndServe())
+}
+
+func metrics(w http.ResponseWriter, r *http.Request) {
+    promhttp.Handler().ServeHTTP(w, r)
 }
