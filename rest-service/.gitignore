@@ -1,0 +1,3 @@
+/cmd/microservice/deploy/tmp
+/cmd/microservice/deploy/.terraform/
+cmd/microservice/app/.aws-sam
