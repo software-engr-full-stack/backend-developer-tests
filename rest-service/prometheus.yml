@@ -13,5 +13,6 @@ scrape_configs:
 
   - job_name: 'rest-service'
     static_configs:
+    # Notes: use host.docker.internal when running the API server directly on localhost.
     # - targets: ['host.docker.internal:8000']
     - targets: ['app:8000']
