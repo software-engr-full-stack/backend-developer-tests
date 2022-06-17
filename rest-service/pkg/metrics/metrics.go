@@ -14,6 +14,25 @@ const (
 )
 
 func Init() error {
+    // https://pkg.go.dev/github.com/prometheus/client_golang/prometheus#Registerer
+    // Register registers a new Collector to be included in metrics
+    // collection. It returns an error if the descriptors provided by the
+    // Collector are invalid or if they — in combination with descriptors of
+    // already registered Collectors — do not fulfill the consistency and
+    // uniqueness criteria described in the documentation of metric.Desc.
+    //
+    // If the provided Collector is equal to a Collector already registered
+    // (which includes the case of re-registering the same Collector), the
+    // returned error is an instance of AlreadyRegisteredError, which
+    // contains the previously registered Collector.
+    //
+    // A Collector whose Describe method does not yield any Desc is treated
+    // as unchecked. Registration will always succeed. No check for
+    // re-registering (see previous paragraph) is performed. Thus, the
+    // caller is responsible for not double-registering the same unchecked
+    // Collector, and for providing a Collector that will not cause
+    // inconsistent metrics on collection. (This would lead to scrape
+    // errors.)
     err := prometheus.Register(totalRequests)
     if err != nil {
         return err
