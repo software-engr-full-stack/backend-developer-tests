@@ -27,10 +27,10 @@ func FizzBuzz(total, fizzAt, buzzAt int64) []string {
 	}
 
 	result := make([]string, total)
-
+	const base10 = 10
 	for i := int64(1); i <= total; i++ {
 		if !(i%fizzAt == 0) && !(i%buzzAt == 0) {
-			result[i-1] = strconv.FormatInt(i, 10)
+			result[i-1] = strconv.FormatInt(i, base10)
 			continue
 		}
 
