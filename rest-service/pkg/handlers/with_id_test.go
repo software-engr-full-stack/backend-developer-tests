@@ -8,6 +8,7 @@ import (
     "reflect"
     "fmt"
 
+    "github.com/software-engr-full-stack/backend-developer-tests/rest-service/pkg/lib/libtest"
     "github.com/software-engr-full-stack/backend-developer-tests/rest-service/pkg/models"
 )
 
@@ -22,7 +23,7 @@ func TestPeopleID(t *testing.T) {
         expected expectedType
     }
 
-    expectedPerson := expectedPeople[2]
+    expectedPerson := libtest.ExpectedPeople[2]
     nonExistentID := "d135b79c-ef02-4b1f-81c7-d8c25d423c55"
     tests := []testType{
         testType{
@@ -45,17 +46,25 @@ func TestPeopleID(t *testing.T) {
         res := w.Result()
         defer res.Body.Close() //nolint:gocritic,deferInLoop
 
-        data := runCommonTests(t, test.path, res, test.expected.statusCode)
+        data := libtest.TestResponseMeta(
+            t,
+            libtest.TestHTTPResponseType{
+                Path: test.path,
+                Response: res,
+                ExpectedStatusCode: test.expected.statusCode,
+                ExpectedHeader: []string{"application/json; charset=utf-8"},
+            },
+        )
 
-        tb := titleBuilder{path: test.path}
+        ptb := libtest.PathTitleBuilder{Path: test.path}
 
         if test.expected.error != nil {
             var eresp map[string]string
-            title := tb.build("unmarshal response body error")
+            title := ptb.Build("unmarshal response body error")
             if actual, expected := json.Unmarshal(data, &eresp), error(nil); actual != expected {
                 t.Fatalf("%s: actual not equal to expected, %#v != %#v", title, actual, expected)
             }
-            title = tb.build("error details")
+            title = ptb.Build("error details")
             if actual, expected := eresp["error"], test.expected.error.Error(); actual != expected {
                 t.Fatalf("%s: actual not equal to expected, %#v != %#v", title, actual, expected)
             }
@@ -63,12 +72,12 @@ func TestPeopleID(t *testing.T) {
         }
 
         var actualPerson *models.Person
-        title := tb.build("unmarshal response body error")
+        title := ptb.Build("unmarshal response body error")
         if actual, expected := json.Unmarshal(data, &actualPerson), error(nil); actual != expected {
             t.Fatalf("%s: actual not equal to expected, %#v != %#v", title, actual, expected)
         }
 
-        title = tb.build("person details")
+        title = ptb.Build("person details")
         if isDeepEqual := reflect.DeepEqual(actualPerson, expectedPerson); !isDeepEqual {
             t.Fatalf("%s: actual not equal to expected, %#v != %#v", title, actualPerson, expectedPerson)
         }

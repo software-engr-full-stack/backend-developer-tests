@@ -4,10 +4,8 @@ import (
     "testing"
     "net/http"
     "net/http/httptest"
-    "encoding/json"
-    "reflect"
-    "fmt"
 
+    "github.com/software-engr-full-stack/backend-developer-tests/rest-service/pkg/lib/libtest"
     "github.com/software-engr-full-stack/backend-developer-tests/rest-service/pkg/models"
 )
 
@@ -20,6 +18,7 @@ func TestPeoplePhoneNumber(t *testing.T) {
         input
         expected []*models.Person
     }
+    expectedPeople := libtest.ExpectedPeople
     tests := []testType{
         testType{
             input: input{phoneNumber: "+44 7700 900077"},
@@ -50,32 +49,16 @@ func TestPeoplePhoneNumber(t *testing.T) {
         res := w.Result()
         defer res.Body.Close() //nolint:gocritic,deferInLoop
 
-        data := runCommonTests(t, path, res, 200)
+        data := libtest.TestResponseMeta(
+            t,
+            libtest.TestHTTPResponseType{
+                Path: path,
+                Response: res,
+                ExpectedStatusCode: 200,
+                ExpectedHeader: []string{"application/json; charset=utf-8"},
+            },
+        )
 
-        tb := titleBuilder{path: path}
-
-        var actualPeople []*models.Person
-        title := tb.build("unmarshal response body error")
-        if actual, expected := json.Unmarshal(data, &actualPeople), error(nil); actual != expected {
-            t.Fatalf("%s: actual not equal to expected, %#v != %#v", title, actual, expected)
-        }
-
-        title = tb.build("people count")
-        if actual, expected := len(actualPeople), len(test.expected); actual != expected {
-            t.Fatalf("%s: actual not equal to expected, %#v != %#v", title, actual, expected)
-        }
-
-        for _, actualPerson := range actualPeople {
-            key := buildKey(actualPerson.LastName, actualPerson.FirstName, actualPerson.PhoneNumber)
-            title = tb.build(fmt.Sprintf("presence of person %#v", key))
-            expectedPerson, ok := expectedPeopleMap[key]
-            if actual, expected := ok, true; actual != expected {
-                t.Fatalf("%s: actual not equal to expected, %#v != %#v", title, actual, expected)
-            }
-            title = tb.build("person details")
-            if isDeepEqual := reflect.DeepEqual(actualPerson, expectedPerson); !isDeepEqual {
-                t.Fatalf("%s: actual not equal to expected, %#v != %#v", title, actualPerson, expectedPerson)
-            }
-        }
+        libtest.TestResponseData(t, path, data, libtest.BuildPeopleMap(test.expected))
     }
 }
